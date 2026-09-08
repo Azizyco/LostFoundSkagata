@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Barang Hilang & Temuan - SMKN 3 Yogyakarta</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f6f8f7;color:#24302a}
+  .hidden{display:none!important}
+  a{color:inherit}
+
+  /* ===== Halaman Siswa (publik) ===== */
+  .public-wrap{min-height:100vh;background:linear-gradient(135deg,#eaf6ef,#f8fbf9)}
+  .public-topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;background:#245f45;color:#fff}
+  .public-brand{display:flex;gap:12px;align-items:center}
+  .logo{width:42px;height:42px;border-radius:12px;background:#3b8d64;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+  .public-brand h1{font-size:17px;margin:0}
+  .public-brand .muted-light{font-size:12px;color:#cfe6da}
+  .btn-guru{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);padding:9px 14px;border-radius:10px;font:inherit;cursor:pointer}
+  .btn-guru:hover{background:rgba(255,255,255,.24)}
+
+  .public-hero{padding:38px 32px 8px;max-width:1000px;margin:0 auto}
+  .public-hero h2{font-size:26px;margin:0 0 6px}
+  .public-hero p{color:#5a6a61;margin:0 0 20px;line-height:1.5}
+  .search-box{display:flex;gap:10px;flex-wrap:wrap;background:#fff;padding:14px;border-radius:16px;box-shadow:0 8px 26px rgba(0,0,0,.06)}
+  .search-box input{flex:1;min-width:200px}
+  .search-box select{min-width:170px}
+
+  .public-body{max-width:1000px;margin:0 auto;padding:22px 32px 60px}
+  .info-note{background:#eaf6ef;border:1px solid #cdeadb;color:#2e6f4e;padding:14px 16px;border-radius:12px;margin-bottom:20px;font-size:14px;line-height:1.5}
+  .item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .item-card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 18px rgba(0,0,0,.045);cursor:pointer;transition:transform .12s ease}
+  .item-card:hover{transform:translateY(-2px)}
+  .item-photo{height:110px;background:#e9efeb;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:12px}
+  .item-card h4{margin:0 0 4px;font-size:15px}
+  .item-card .meta{font-size:12px;color:#6a776f;margin-bottom:8px;line-height:1.5}
+  .empty-state{text-align:center;padding:50px 10px;color:#7c8a82}
+
+  /* ===== Umum ===== */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#eaf6ef,#f8fbf9)}
+  .login-card{width:390px;background:#fff;border-radius:18px;padding:34px;box-shadow:0 12px 40px rgba(0,0,0,.08)}
+  .brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}
+  h1{font-size:22px;margin:0}.muted{color:#6f7d75;font-size:14px}
+  label{display:block;font-size:13px;margin:14px 0 6px}
+  input,select,textarea{width:100%;padding:11px 12px;border:1px solid #dbe4df;border-radius:10px;background:#fff;font:inherit}
+  textarea{min-height:90px;resize:vertical}
+  button{border:0;border-radius:10px;padding:10px 14px;font:inherit;cursor:pointer}
+  .btn-primary{background:#3b8d64;color:#fff}.btn-light{background:#edf5f0;color:#2e6f4e}.btn-danger{background:#fdecec;color:#9e3333}
+  .full{width:100%;margin-top:18px}
+  .back-link{display:inline-block;margin-bottom:14px;background:none;color:#3b8d64;padding:0;font-size:13px}
+  .app{display:flex;min-height:100vh}
+  .sidebar{width:250px;background:#245f45;color:#fff;padding:24px 16px;position:fixed;left:0;top:0;bottom:0}
+  .sidebar .title{font-size:18px;font-weight:700;padding:0 10px 18px;border-bottom:1px solid rgba(255,255,255,.18)}
+  .nav{margin-top:18px}
+  .nav button{width:100%;text-align:left;margin:5px 0;background:transparent;color:#eaf4ee;padding:11px 12px}
+  .nav button:hover,.nav button.active{background:rgba(255,255,255,.13)}
+  .content{margin-left:250px;width:calc(100% - 250px);padding:28px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+  .page-title{font-size:25px;font-weight:700}.badge-user{background:#fff;padding:9px 13px;border-radius:10px;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+  .card{background:#fff;border-radius:15px;padding:18px;box-shadow:0 4px 18px rgba(0,0,0,.045)}
+  .card .num{font-size:30px;font-weight:700;color:#2f7d57;margin-top:8px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 22px}
+  .panel{background:#fff;border-radius:15px;padding:20px;box-shadow:0 4px 18px rgba(0,0,0,.045)}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{padding:12px 10px;border-bottom:1px solid #edf0ee;text-align:left;font-size:14px}
+  th{color:#65736b;font-size:13px}
+  .status{display:inline-block;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:700}
+  .waiting{background:#fff5d9;color:#9a6a00}.done{background:#e7f5ed;color:#26734b}
+  .row-actions button{padding:6px 9px;font-size:12px;margin-right:4px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .span-2{grid-column:1/-1}
+  .toolbar{display:flex;gap:10px;margin-bottom:14px}
+  .toolbar input,.toolbar select{max-width:220px}
+  .detail-grid{display:grid;grid-template-columns:220px 1fr;gap:22px}
+  .photo{height:180px;background:#e9efeb;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:46px}
+  .detail-list{display:grid;grid-template-columns:170px 1fr;row-gap:10px}
+  .detail-list div:nth-child(odd){color:#6a776f}
+  .toast{position:fixed;right:22px;bottom:22px;background:#245f45;color:#fff;padding:13px 16px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);display:none;z-index:99}
+  @media(max-width:900px){
+    .sidebar{width:200px}.content{margin-left:200px;width:calc(100% - 200px)}.cards{grid-template-columns:repeat(2,1fr)}
+    .public-topbar{padding:14px 18px}.public-hero{padding:26px 18px 4px}.public-body{padding:18px 18px 50px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HALAMAN SISWA (PUBLIK, TANPA LOGIN) ============ -->
+<div id="siswaPage" class="public-wrap">
+  <div class="public-topbar">
+    <div class="public-brand">
+      <div class="logo">SMK3</div>
+      <div><h1>Barang Hilang & Temuan</h1><div class="muted-light">SMKN 3 Yogyakarta</div></div>
+    </div>
+    <button class="btn-guru" onclick="showLogin()">Login Guru Piket</button>
+  </div>
+
+  <div class="public-hero">
+    <h2>Cari barangmu yang hilang</h2>
+    <p>Semua barang temuan yang dilaporkan ke ruang piket dicatat di sini. Cari nama barangmu di bawah, lalu datang langsung ke ruang piket untuk mengambilnya.</p>
+    <div class="search-box">
+      <input id="siswaSearch" placeholder="Cari nama barang (contoh: kalkulator, dompet)..." oninput="renderSiswaList()">
+      <select id="siswaKategori" onchange="renderSiswaList()">
+        <option value="">Semua Kategori</option>
+        <option>Elektronik</option>
+        <option>Alat Tulis</option>
+        <option>Pakaian</option>
+        <option>Aksesori</option>
+        <option>Lainnya</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="public-body">
+    <div class="info-note">
+      Menemukan barangmu di daftar ini? Datang ke <strong>ruang piket</strong> dan sebutkan ciri-ciri barang tersebut kepada guru piket untuk proses pengambilan. Pengambilan hanya dapat diproses langsung oleh guru piket.
+    </div>
+    <div id="siswaGrid" class="item-grid"></div>
+    <div id="siswaEmpty" class="empty-state hidden">Tidak ada barang yang cocok dengan pencarianmu.</div>
+  </div>
+</div>
+
+<!-- ============ DETAIL BARANG UNTUK SISWA ============ -->
+<div id="siswaDetail" class="page-siswa-detail hidden public-wrap">
+  <div class="public-topbar">
+    <div class="public-brand">
+      <div class="logo">SMK3</div>
+      <div><h1>Barang Hilang & Temuan</h1><div class="muted-light">SMKN 3 Yogyakarta</div></div>
+    </div>
+    <button class="btn-guru" onclick="showLogin()">Login Guru Piket</button>
+  </div>
+  <div class="public-body">
+    <button class="back-link" onclick="backToSiswaList()">← Kembali ke daftar</button>
+    <div class="panel">
+      <div class="detail-grid">
+        <div class="photo" id="siswaDetailPhoto">🎒</div>
+        <div>
+          <h3 id="siswaDetailName">Kalkulator</h3>
+          <div class="detail-list">
+            <div>Kode Barang</div><div id="siswaDetailKode">-</div>
+            <div>Kategori</div><div id="siswaDetailKategori">-</div>
+            <div>Tanggal Ditemukan</div><div id="siswaDetailTanggal">-</div>
+            <div>Lokasi Ditemukan</div><div id="siswaDetailLokasi">-</div>
+            <div>Ciri Barang</div><div id="siswaDetailCiri">-</div>
+            <div>Status</div><div id="siswaDetailStatus">-</div>
+          </div>
+          <div class="info-note" style="margin-top:18px">
+            Jika ini barangmu, silakan datang ke <strong>ruang piket</strong> dan sampaikan ciri-ciri barang ini kepada guru piket untuk diproses pengambilannya.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOGIN GURU PIKET ============ -->
+<div id="loginPage" class="login-wrap hidden">
+  <div class="login-card">
+    <button class="back-link" onclick="backToSiswa()">← Kembali ke halaman pencarian siswa</button>
+    <div class="brand">
+      <div class="logo">SMK3</div>
+      <div><h1>Login Guru Piket</h1><div class="muted">SMKN 3 Yogyakarta</div></div>
+    </div>
+    <label>Username</label><input placeholder="Masukkan username" value="gurupiket">
+    <label>Password</label><input type="password" placeholder="Masukkan password" value="123456">
+    <button class="btn-primary full" onclick="login()">Masuk</button>
+    <p class="muted" style="text-align:center;margin-top:12px">Prototype — login tidak memerlukan database</p>
+  </div>
+</div>
+
+<!-- ============ APLIKASI GURU PIKET ============ -->
+<div id="appPage" class="app hidden">
+  <aside class="sidebar">
+    <div class="title">SMKN 3 Yogyakarta</div>
+    <div class="nav">
+      <button data-page="dashboard" class="active" onclick="showPage('dashboard',this)">▦ Dashboard</button>
+      <button data-page="data" onclick="showPage('data',this)">▤ Data Barang</button>
+      <button data-page="tambah" onclick="showPage('tambah',this)">＋ Tambah Barang</button>
+      <button data-page="riwayat" onclick="showPage('riwayat',this)">↺ Riwayat Pengambilan</button>
+      <button onclick="logout()">⇦ Logout</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div><div id="pageTitle" class="page-title">Dashboard</div><div class="muted">Sistem pencatatan barang hilang dan temuan</div></div>
+      <div class="badge-user">Guru Piket</div>
+    </div>
+
+    <section id="dashboard" class="page">
+      <div class="cards">
+        <div class="card"><div class="muted">Total Barang</div><div class="num">18</div></div>
+        <div class="card"><div class="muted">Belum Diambil</div><div class="num">7</div></div>
+        <div class="card"><div class="muted">Sudah Diambil</div><div class="num">11</div></div>
+        <div class="card"><div class="muted">Ditemukan Hari Ini</div><div class="num">3</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn-primary" onclick="showPage('tambah')">＋ Tambah Barang Temuan</button>
+        <button class="btn-light" onclick="showPage('data')">Lihat Data Barang</button>
+        <button class="btn-light" onclick="showPage('riwayat')">Riwayat Pengambilan</button>
+      </div>
+      <div class="panel">
+        <h3>Barang Temuan Terbaru</h3>
+        <table>
+          <tr><th>Kode</th><th>Barang</th><th>Tanggal</th><th>Lokasi</th><th>Status</th><th>Aksi</th></tr>
+          <tr><td>BT-2026-0018</td><td>Kalkulator</td><td>07/09/2026</td><td>Lab Komputer</td><td><span class="status waiting">Belum Diambil</span></td><td><button class="btn-light" onclick="showDetail('Kalkulator')">Detail</button></td></tr>
+          <tr><td>BT-2026-0017</td><td>Botol Minum</td><td>07/09/2026</td><td>Lapangan</td><td><span class="status waiting">Belum Diambil</span></td><td><button class="btn-light" onclick="showDetail('Botol Minum')">Detail</button></td></tr>
+          <tr><td>BT-2026-0016</td><td>Flashdisk</td><td>06/09/2026</td><td>Ruang 45</td><td><span class="status done">Sudah Diambil</span></td><td><button class="btn-light" onclick="showDetail('Flashdisk')">Detail</button></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="tambah" class="page hidden">
+      <div class="panel">
+        <h3>Tambah Barang Temuan</h3>
+        <div class="form-grid">
+          <div><label>Nama Barang</label><input id="namaBarang" placeholder="Contoh: Kalkulator"></div>
+          <div><label>Kategori</label><select><option>Elektronik</option><option>Alat Tulis</option><option>Pakaian</option><option>Aksesori</option><option>Lainnya</option></select></div>
+          <div><label>Tanggal Ditemukan</label><input type="date" value="2026-09-07"></div>
+          <div><label>Lokasi Ditemukan</label><input placeholder="Contoh: Lab Komputer"></div>
+          <div><label>Nama Penemu</label><input placeholder="Nama siswa/penemu"></div>
+          <div><label>Foto Barang</label><input type="file"></div>
+          <div class="span-2"><label>Keterangan / Ciri Barang</label><textarea placeholder="Tuliskan ciri-ciri barang"></textarea></div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" onclick="saveItem()">Simpan</button>
+          <button class="btn-light" onclick="showPage('data')">Batal</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="data" class="page hidden">
+      <div class="panel">
+        <h3>Data Barang</h3>
+        <div class="toolbar">
+          <input placeholder="Cari barang...">
+          <select><option>Semua Status</option><option>Belum Diambil</option><option>Sudah Diambil</option></select>
+          <button class="btn-primary" onclick="showPage('tambah')">＋ Tambah</button>
+        </div>
+        <table>
+          <tr><th>Kode</th><th>Nama Barang</th><th>Kategori</th><th>Tanggal</th><th>Lokasi</th><th>Status</th><th>Aksi</th></tr>
+          <tr><td>BT-2026-0018</td><td>Kalkulator</td><td>Elektronik</td><td>07/09/2026</td><td>Lab Komputer</td><td><span class="status waiting">Belum Diambil</span></td><td class="row-actions"><button class="btn-light" onclick="showDetail('Kalkulator')">Detail</button><button class="btn-primary" onclick="pickup('Kalkulator')">Ambil</button></td></tr>
+          <tr><td>BT-2026-0017</td><td>Botol Minum</td><td>Lainnya</td><td>07/09/2026</td><td>Lapangan</td><td><span class="status waiting">Belum Diambil</span></td><td class="row-actions"><button class="btn-light" onclick="showDetail('Botol Minum')">Detail</button><button class="btn-primary" onclick="pickup('Botol Minum')">Ambil</button></td></tr>
+          <tr><td>BT-2026-0016</td><td>Flashdisk</td><td>Elektronik</td><td>06/09/2026</td><td>Ruang 45</td><td><span class="status done">Sudah Diambil</span></td><td class="row-actions"><button class="btn-light" onclick="showDetail('Flashdisk')">Detail</button></td></tr>
+          <tr><td>BT-2026-0015</td><td>Jaket</td><td>Pakaian</td><td>05/09/2026</td><td>Masjid</td><td><span class="status waiting">Belum Diambil</span></td><td class="row-actions"><button class="btn-light" onclick="showDetail('Jaket')">Detail</button><button class="btn-primary" onclick="pickup('Jaket')">Ambil</button></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="detail" class="page hidden">
+      <div class="panel">
+        <div class="detail-grid">
+          <div class="photo">🎒</div>
+          <div>
+            <h3 id="detailName">Kalkulator</h3>
+            <div class="detail-list">
+              <div>Kode Barang</div><div>BT-2026-0018</div>
+              <div>Kategori</div><div>Elektronik</div>
+              <div>Tanggal Ditemukan</div><div>07 September 2026</div>
+              <div>Lokasi Ditemukan</div><div>Lab Komputer</div>
+              <div>Nama Penemu</div><div>Andi</div>
+              <div>Ciri Barang</div><div>Warna hitam, terdapat stiker kecil di bagian belakang.</div>
+              <div>Status</div><div><span class="status waiting">Belum Diambil</span></div>
+            </div>
+            <div class="actions">
+              <button class="btn-light" onclick="showPage('data')">Kembali</button>
+              <button class="btn-primary" onclick="pickup(document.getElementById('detailName').innerText)">Proses Pengambilan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ambil" class="page hidden">
+      <div class="panel">
+        <h3>Proses Pengambilan Barang</h3>
+        <p class="muted">Barang: <strong id="pickupItem">Kalkulator</strong></p>
+        <div class="form-grid">
+          <div><label>Nama Pengambil</label><input placeholder="Nama siswa"></div>
+          <div><label>Kelas</label><input placeholder="Contoh: XI TJKT 1"></div>
+          <div><label>Nomor Telepon</label><input placeholder="08xxxxxxxxxx"></div>
+          <div><label>Tanggal Pengambilan</label><input type="date" value="2026-09-07"></div>
+          <div class="span-2"><label>Keterangan / Bukti Kepemilikan</label><textarea placeholder="Contoh: menyebutkan ciri khusus barang dengan benar"></textarea></div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" onclick="confirmPickup()">Konfirmasi Pengambilan</button>
+          <button class="btn-light" onclick="showPage('data')">Batal</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="riwayat" class="page hidden">
+      <div class="panel">
+        <h3>Riwayat Pengambilan</h3>
+        <table>
+          <tr><th>Kode</th><th>Barang</th><th>Nama Pengambil</th><th>Kelas</th><th>No. Telepon</th><th>Tanggal</th></tr>
+          <tr><td>BT-2026-0016</td><td>Flashdisk</td><td>Nabila Putri</td><td>XI TJKT 2</td><td>0812xxxx1234</td><td>07/09/2026</td></tr>
+          <tr><td>BT-2026-0013</td><td>Kunci Motor</td><td>Rafi Ahmad</td><td>X TAV 1</td><td>0857xxxx3290</td><td>05/09/2026</td></tr>
+          <tr><td>BT-2026-0011</td><td>Dompet</td><td>Fajar Nugroho</td><td>XI TKJ 1</td><td>0821xxxx8891</td><td>03/09/2026</td></tr>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const titles={dashboard:'Dashboard',data:'Data Barang',tambah:'Tambah Barang Temuan',detail:'Detail Barang',ambil:'Proses Pengambilan',riwayat:'Riwayat Pengambilan'};
+
+// Data barang temuan (contoh, dibagi oleh halaman siswa & guru)
+const barangTemuan=[
+  {kode:'BT-2026-0018',nama:'Kalkulator',kategori:'Elektronik',tanggal:'07 September 2026',lokasi:'Lab Komputer',ciri:'Warna hitam, terdapat stiker kecil di bagian belakang.',status:'waiting',icon:'🧮'},
+  {kode:'BT-2026-0017',nama:'Botol Minum',kategori:'Lainnya',tanggal:'07 September 2026',lokasi:'Lapangan',ciri:'Warna hijau tosca, ada tempelan nama di badan botol.',status:'waiting',icon:'🧴'},
+  {kode:'BT-2026-0015',nama:'Jaket',kategori:'Pakaian',tanggal:'05 September 2026',lokasi:'Masjid',ciri:'Jaket almamater, ukuran M, ada bordir nama di dada.',status:'waiting',icon:'🧥'},
+  {kode:'BT-2026-0016',nama:'Flashdisk',kategori:'Elektronik',tanggal:'06 September 2026',lokasi:'Ruang 45',ciri:'Flashdisk 16GB warna merah, sudah diambil pemiliknya.',status:'done',icon:'💾'}
+];
+
+/* ===== Navigasi halaman utama (siswa / login / guru) ===== */
+function showLogin(){
+  document.getElementById('siswaPage').classList.add('hidden');
+  document.getElementById('siswaDetail').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+}
+function backToSiswa(){
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('siswaPage').classList.remove('hidden');
+}
+function login(){
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('appPage').classList.remove('hidden');
+}
+function logout(){
+  document.getElementById('appPage').classList.add('hidden');
+  document.getElementById('siswaPage').classList.remove('hidden');
+}
+
+/* ===== Halaman siswa: cari barang ===== */
+function renderSiswaList(){
+  const q=(document.getElementById('siswaSearch').value||'').toLowerCase();
+  const kategori=document.getElementById('siswaKategori').value;
+  const grid=document.getElementById('siswaGrid');
+  const empty=document.getElementById('siswaEmpty');
+  const filtered=barangTemuan.filter(b=>{
+    const matchQ=b.nama.toLowerCase().includes(q);
+    const matchK=!kategori||b.kategori===kategori;
+    return matchQ&&matchK;
+  });
+  grid.innerHTML='';
+  if(filtered.length===0){
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  filtered.forEach(b=>{
+    const statusLabel=b.status==='waiting'?'Belum Diambil':'Sudah Diambil';
+    const statusClass=b.status==='waiting'?'waiting':'done';
+    const el=document.createElement('div');
+    el.className='item-card';
+    el.onclick=()=>showSiswaDetail(b.kode);
+    el.innerHTML=`
+      <div class="item-photo">${b.icon}</div>
+      <h4>${b.nama}</h4>
+      <div class="meta">${b.kategori} · ${b.lokasi}<br>Ditemukan ${b.tanggal}</div>
+      <span class="status ${statusClass}">${statusLabel}</span>
+    `;
+    grid.appendChild(el);
+  });
+}
+function showSiswaDetail(kode){
+  const b=barangTemuan.find(x=>x.kode===kode);
+  if(!b)return;
+  document.getElementById('siswaDetailPhoto').innerText=b.icon;
+  document.getElementById('siswaDetailName').innerText=b.nama;
+  document.getElementById('siswaDetailKode').innerText=b.kode;
+  document.getElementById('siswaDetailKategori').innerText=b.kategori;
+  document.getElementById('siswaDetailTanggal').innerText=b.tanggal;
+  document.getElementById('siswaDetailLokasi').innerText=b.lokasi;
+  document.getElementById('siswaDetailCiri').innerText=b.ciri;
+  const statusLabel=b.status==='waiting'?'Belum Diambil':'Sudah Diambil';
+  const statusClass=b.status==='waiting'?'waiting':'done';
+  document.getElementById('siswaDetailStatus').innerHTML=`<span class="status ${statusClass}">${statusLabel}</span>`;
+  document.getElementById('siswaPage').classList.add('hidden');
+  document.getElementById('siswaDetail').classList.remove('hidden');
+}
+function backToSiswaList(){
+  document.getElementById('siswaDetail').classList.add('hidden');
+  document.getElementById('siswaPage').classList.remove('hidden');
+}
+renderSiswaList();
+
+/* ===== Aplikasi guru piket (setelah login) ===== */
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById('pageTitle').innerText=titles[id]||'';
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  const navbtn=document.querySelector('.nav button[data-page="'+id+'"]');
+  if(navbtn) navbtn.classList.add('active');
+}
+function showDetail(name){
+  document.getElementById('detailName').innerText=name;
+  showPage('detail');
+}
+function pickup(name){
+  document.getElementById('pickupItem').innerText=name;
+  showPage('ambil');
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.innerText=msg;t.style.display='block';
+  setTimeout(()=>t.style.display='none',2200);
+}
+function saveItem(){
+  const name=document.getElementById('namaBarang').value||'Barang temuan';
+  toast('Data '+name+' berhasil disimpan');
+  setTimeout(()=>showPage('data'),800);
+}
+function confirmPickup(){
+  toast('Barang berhasil dicatat sebagai sudah diambil');
+  setTimeout(()=>showPage('riwayat'),800);
+}
+</script>
+</body>
+</html>
