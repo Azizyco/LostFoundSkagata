@@ -177,6 +177,7 @@
       <button data-page="dashboard" class="active" onclick="showPage('dashboard',this)">▦ Dashboard</button>
       <button data-page="data" onclick="showPage('data',this)">▤ Data Barang</button>
       <button data-page="tambah" onclick="showPage('tambah',this)">＋ Tambah Barang</button>
+      <button data-page="rekap" onclick="showPage('rekap',this)">📊 Rekapan Data</button>
       <button data-page="riwayat" onclick="showPage('riwayat',this)">↺ Riwayat Pengambilan</button>
       <button onclick="logout()">⇦ Logout</button>
     </div>
@@ -237,6 +238,7 @@
           <input placeholder="Cari barang...">
           <select><option>Semua Status</option><option>Belum Diambil</option><option>Sudah Diambil</option></select>
           <button class="btn-primary" onclick="showPage('tambah')">＋ Tambah</button>
+          <button class="btn-primary" onclick="showPage('rekap')"> Rekap Data</button>
         </div>
         <table>
           <tr><th>Kode</th><th>Nama Barang</th><th>Kategori</th><th>Tanggal</th><th>Lokasi</th><th>Status</th><th>Aksi</th></tr>
